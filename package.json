@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "",
   "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0",
+  "private": false,
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
