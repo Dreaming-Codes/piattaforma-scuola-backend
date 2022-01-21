@@ -20,6 +20,10 @@ export class User {
     @Field(()=>String)
     _id: Types.ObjectId;
 
+    @Field(()=>String)
+    @Prop({required: false})
+    avatar: string;
+
     @Field(()=>String, {defaultValue: Roles.Student, nullable: true})
     @Prop()
     role: string;
