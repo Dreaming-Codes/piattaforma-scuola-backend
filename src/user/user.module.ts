@@ -4,7 +4,7 @@ import { UserResolver } from './user.resolver';
 import {MongooseModule} from "@nestjs/mongoose";
 import {User, UserSchema} from "./user.entity";
 import {JwtModule} from "@nestjs/jwt";
-import {JwtStrategy} from "./jwt.strategy";
+import {GoogleStrategy} from "../google/google.strategy";
 import {ConfigModule} from "@nestjs/config";
 
 @Module({
@@ -16,6 +16,6 @@ import {ConfigModule} from "@nestjs/config";
       }),
       MongooseModule.forFeature([{name: User.name, schema: UserSchema}])
   ],
-  providers: [UserResolver, UserService, JwtStrategy]
+  providers: [UserResolver, UserService, GoogleStrategy]
 })
 export class UserModule {}

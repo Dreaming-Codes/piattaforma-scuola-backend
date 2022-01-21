@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import {GraphQLModule} from "@nestjs/graphql";
 import {MongooseModule} from "@nestjs/mongoose";
 import { UserModule } from './user/user.module';
+import { GoogleModule } from './google/google.module';
 
 @Module({
   imports: [ConfigModule.forRoot(), MongooseModule.forRoot("mongodb://localhost:27017/test"), GraphQLModule.forRoot({
@@ -12,7 +13,7 @@ import { UserModule } from './user/user.module';
     installSubscriptionHandlers: true,
     playground: true,
     debug: false
-  }), UserModule],
+  }), UserModule, GoogleModule],
   providers: [AppService, AppResolver],
 })
 export class AppModule {}
