@@ -4,6 +4,7 @@ import {Document, Types} from "mongoose";
 
 enum Roles {
     Admin = 'Admin',
+    Headmaster = 'Headmaster',
     Secretariat = 'Secretariat',
     Teacher = "Teacher",
     Student = "Student"
@@ -21,20 +22,20 @@ export class User {
     _id: Types.ObjectId;
 
     @Field(()=>String)
-    @Prop({required: false})
+    @Prop({required: true})
+    name: string;
+
+    @Field(()=>String)
+    @Prop()
     avatar: string;
 
     @Field(()=>String, {defaultValue: Roles.Student, nullable: true})
-    @Prop()
+    @Prop({required: true, default: Roles.Student})
     role: string;
 
     @Field(()=>String)
-    @Prop({unique: true})
+    @Prop({unique: true, required: true})
     email: string;
-
-    @Field(()=>String)
-    @Prop()
-    password: string;
 }
 
 export type UserDocument = User & Document;
