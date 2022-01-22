@@ -26,6 +26,10 @@ export class User {
     name: string;
 
     @Field(()=>String)
+    @Prop({required: true})
+    surname: string;
+
+    @Field(()=>String)
     @Prop()
     avatar: string;
 
