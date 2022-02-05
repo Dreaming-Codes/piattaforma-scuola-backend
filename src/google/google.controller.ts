@@ -2,6 +2,7 @@ import {Controller, Get, Req, Res, UseGuards} from '@nestjs/common';
 import {AuthGuard} from "@nestjs/passport";
 import {Request, Response} from "express";
 import {JwtGuard} from "./jwt.guard";
+import {GoogleGuard} from "./google.guard";
 
 @Controller('google')
 export class GoogleController {
@@ -12,15 +13,13 @@ export class GoogleController {
   }
 
   @Get('redirect')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleGuard)
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
-    if(req.user){
+    if(req.user) {
       res.redirect('https://localhost/authComplete?token=' + req.user)
-    }else {
-      //TODO: Handle error on frontend
+    }else{
       res.redirect('https://localhost/authFailed')
     }
-
   }
 
   @Get('isAuthenticated')

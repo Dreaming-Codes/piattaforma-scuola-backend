@@ -11,10 +11,6 @@ export class UserService {
     async processUser(user: GoogleUserInterface){
         const dbUser = await this.UserModel.findOne({email: user.email}).exec();
 
-        if(dbUser){
-            return dbUser;
-        }else{
-            return await new this.UserModel(user).save();
-        }
+        return dbUser || await new this.UserModel(user).save();
     }
 }

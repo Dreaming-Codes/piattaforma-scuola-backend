@@ -1,6 +1,6 @@
 import {PassportStrategy} from '@nestjs/passport';
 import {Injectable} from "@nestjs/common";
-import {Strategy} from "passport-google-oauth20";
+import {Strategy, VerifyCallback} from "passport-google-oauth20";
 import {GoogleUserInterface} from "./googleUser.interface";
 import {UserService} from "../user/user.service";
 import {JwtService} from "@nestjs/jwt";
@@ -13,11 +13,16 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
             clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
             callbackURL: process.env.API_BACKEND_SSL_RECOMMENDED + '/google/redirect',
             scope: ['email', 'profile'],
+            authorizationURL: 'https://accounts.google.com/o/oauth2/v2/auth?hd=itismeucci.com',
         });
     }
 
-    async validate(accessToken: string, refreshToken: string, profile: any): Promise<any> {
+    async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback): Promise<any> {
         const {name, emails, photos} = profile;
+
+        if(!emails[0].value.endsWith('@itismeucci.com')) {
+            done('No emails found');
+        }
 
         const user: GoogleUserInterface = {
             name: name.givenName,
