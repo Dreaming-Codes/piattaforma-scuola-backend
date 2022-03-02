@@ -13,4 +13,8 @@ export class UserService {
 
         return dbUser || await new this.UserModel(user).save();
     }
+
+    createUsers(users: UserDocument[]){
+        return this.UserModel.insertMany(users);
+    }
 }

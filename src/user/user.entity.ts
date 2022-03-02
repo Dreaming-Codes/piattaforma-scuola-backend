@@ -30,7 +30,7 @@ export class User {
     surname: string;
 
     //TODO: add validation on name and surname
-    @Field(()=>String, {nullable: false})
+    @Field(()=>String, {nullable: true})
     @Prop()
     fiscalCode: string;
 

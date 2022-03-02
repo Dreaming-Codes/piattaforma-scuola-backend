@@ -9,10 +9,11 @@ import {GoogleModule} from "./google/google.module";
 import { ClassModule } from './class/class.module';
 import { DisorderModule } from './disorder/disorder.module';
 import { DisorderPdfFieldModule } from './disorder-pdf-field/disorder-pdf-field.module';
+import {join} from 'path';
 
 @Module({
   imports: [ConfigModule.forRoot(), MongooseModule.forRoot("mongodb://localhost:27017/test"), GraphQLModule.forRoot({
-    autoSchemaFile: true,
+    autoSchemaFile: join(process.cwd(), 'schema.gql'),
     installSubscriptionHandlers: true,
     playground: true,
     debug: false
