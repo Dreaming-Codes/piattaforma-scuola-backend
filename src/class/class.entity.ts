@@ -7,10 +7,14 @@ import {User} from "../user/user.entity";
 @ObjectType()
 class Teacher {
     @Field(()=>User)
-    user: User;
+    @Prop({ref: User.name, type: [Types.ObjectId]})
+    user: User[];
 
     @Field(()=>[String])
-    teachedSubjects: [string];
+    taughtSubjects: [string];
+
+    @Field(()=>Boolean, {defaultValue: false})
+    isCoordinator: boolean;
 }
 
 @ObjectType()
@@ -32,13 +36,8 @@ export class Class {
     students: User[];
 
     @Field(()=>[User])
-    @Prop({type: [Types.ObjectId], ref: User.name})
+    @Prop()
     teachers: Teacher[];
-
-    @Field(()=>User)
-    @Prop({type: Types.ObjectId, ref: User.name})
-    coordinator: User;
-
 }
 
 export type ClassDocument = Class & Document;

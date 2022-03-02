@@ -43,7 +43,7 @@ export class User {
     role: string;
 
     @Field(()=>String)
-    @Prop({unique: true, required: true})
+    @Prop({unique: false, required: false})
     email: string;
 }
 

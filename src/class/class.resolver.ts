@@ -9,7 +9,7 @@ export class ClassResolver {
     }
 
     @Mutation(()=>Boolean)
-    async importTimetable(@Args('data', {type: ()=> dataTimetable}) data) {
-        return await this.classService.importTimetable(data);
+    importTimetable(@Args('data', {type: ()=> dataTimetable}) data) {
+        return this.classService.importTimetable(data);
     }
 }
