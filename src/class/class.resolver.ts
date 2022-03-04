@@ -9,7 +9,7 @@ export class ClassResolver {
     }
 
     @Mutation(()=>Boolean)
-    importTimetable(@Args('data', {type: ()=> dataTimetable}) data) {
+    importTimetable(@Args('data') data: dataTimetable) {
         return this.classService.importTimetable(data);
     }
 }

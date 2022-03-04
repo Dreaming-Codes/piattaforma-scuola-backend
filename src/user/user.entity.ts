@@ -2,7 +2,7 @@ import {Prop, Schema, SchemaFactory}  from "@nestjs/mongoose";
 import {Field, ObjectType, registerEnumType} from "@nestjs/graphql";
 import {Document, Types} from "mongoose";
 
-enum Role {
+export enum Role {
     Admin = 'Admin',
     Headmaster = 'Headmaster',
     Secretariat = 'Secretariat',
@@ -45,6 +45,10 @@ export class User {
     @Field(()=>String)
     @Prop({unique: false, required: false})
     email: string;
+
+    @Field(()=>Boolean)
+    @Prop({required: true, default: false})
+    manual: boolean;
 }
 
 export type UserDocument = User & Document;
