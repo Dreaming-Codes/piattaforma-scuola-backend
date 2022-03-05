@@ -27,21 +27,26 @@ export class UserService {
     constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>, private ClassService: ClassService) {}
 
     async importStudents(students: [StudentInfo]){
-        await this.UserModel.deleteMany({role: Role.Student, manual: false}).exec();
-        const insertedUsers = await this.UserModel.insertMany(students.map(student => {
-            return {
-                role: Role.Student,
-                manual: false,
-                class: student.class,
-                division: student.division,
-                name: student.name,
-                surname: student.surname,
-                fiscalCode: student.fiscalCode,
-                disorders: student.disorders
-            }
-        }));
+        try{
+            await this.UserModel.deleteMany({role: Role.Student, manual: false}).exec();
+            const insertedUsers = await this.UserModel.insertMany(students.map(student => {
+                return {
+                    role: Role.Student,
+                    manual: false,
+                    class: student.class,
+                    division: student.division,
+                    name: student.name,
+                    surname: student.surname,
+                    fiscalCode: student.fiscalCode,
+                    disorders: student.disorders
+                }
+            }));
 
-        await this.ClassService.setClassesForNewUsers(insertedUsers, students);
+            await this.ClassService.setClassesForNewUsers(insertedUsers, students);
+        }catch (e) {
+            console.error(e);
+            return false;
+        }
 
         return true;
     }
