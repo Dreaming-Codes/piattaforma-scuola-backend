@@ -18,7 +18,9 @@ class Teacher {
 }
 
 @ObjectType()
-@Schema()
+@Schema({
+    autoIndex: true,
+})
 export class Class {
     @Field(()=>String)
     _id: Types.ObjectId;
@@ -42,3 +44,5 @@ export class Class {
 
 export type ClassDocument = Class & Document;
 export const ClassSchema = SchemaFactory.createForClass(Class);
+
+ClassSchema.index({class: 1, division: 1}, {unique: true});

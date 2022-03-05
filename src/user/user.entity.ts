@@ -16,7 +16,9 @@ registerEnumType(Role, {
 });
 
 @ObjectType()
-@Schema()
+@Schema({
+    autoIndex: true,
+})
 export class User {
     @Field(()=>String)
     _id: Types.ObjectId;
@@ -57,3 +59,6 @@ export class User {
 
 export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);
+
+//This is mandatory for permitting import after and then login with email
+UserSchema.index({name: 1, surname: 1}, {unique: true});
