@@ -49,6 +49,10 @@ export class User {
     @Field(()=>Boolean)
     @Prop({required: true, default: false})
     manual: boolean;
+
+    @Field(()=>[String], {defaultValue: []})
+    @Prop({default: []})
+    disorders: string[];
 }
 
 export type UserDocument = User & Document;

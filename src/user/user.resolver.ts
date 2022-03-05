@@ -7,6 +7,6 @@ export class UserResolver {
 
     @Mutation(()=>Boolean)
     importStudents(@Args('students', {type: () => [StudentInfo]}) students: [StudentInfo]) {
-        return this.userService.importUsers(students);
+        return this.userService.importStudents(students);
     }
 }

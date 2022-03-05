@@ -10,9 +10,10 @@ import { ClassModule } from './class/class.module';
 import { DisorderModule } from './disorder/disorder.module';
 import { DisorderPdfFieldModule } from './disorder-pdf-field/disorder-pdf-field.module';
 import {join} from 'path';
+import {EventEmitterModule} from "@nestjs/event-emitter";
 
 @Module({
-  imports: [ConfigModule.forRoot(), MongooseModule.forRoot("mongodb://localhost:27017/test"), GraphQLModule.forRoot({
+  imports: [ConfigModule.forRoot(), EventEmitterModule.forRoot(), MongooseModule.forRoot("mongodb://localhost:27017/test"), GraphQLModule.forRoot({
     autoSchemaFile: join(process.cwd(), 'schema.gql'),
     installSubscriptionHandlers: true,
     playground: true,

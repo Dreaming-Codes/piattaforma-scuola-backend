@@ -4,6 +4,7 @@ import {InjectModel} from "@nestjs/mongoose";
 import {Role, User, UserDocument} from "./user.entity";
 import {Model} from "mongoose";
 import {Field, InputType} from "@nestjs/graphql";
+import {ClassService, Teacher} from "../class/class.service";
 
 @InputType()
 export class StudentInfo {
@@ -17,15 +18,15 @@ export class StudentInfo {
     surname: string;
     @Field()
     fiscalCode: string;
-    @Field()
-    disorder: string;
+    @Field(() => [String])
+    disorders: [string];
 }
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
+    constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>, private ClassService: ClassService) {}
 
-    async importUsers(students: [StudentInfo]){
+    async importStudents(students: [StudentInfo]){
         await this.UserModel.deleteMany({role: Role.Student, manual: false}).exec();
         const insertedUsers = await this.UserModel.insertMany(students.map(student => {
             return {
@@ -36,24 +37,23 @@ export class UserService {
                 name: student.name,
                 surname: student.surname,
                 fiscalCode: student.fiscalCode,
-                disorder: student.disorder
+                disorders: student.disorders
             }
         }));
 
-        await this.UserModel.bulkWrite(insertedUsers.map((user, index) => {
-            return {
-                classes: {
-                    filter: {class: students[index].class, division: students[index].division},
-                    update: {
-                        push: {
-                            students: user._id
-                        }
-                    }
-                }
-            }
-        }));
+        await this.ClassService.setClassesForNewUsers(insertedUsers, students);
 
         return true;
+    }
+
+    importTeachers(teachers: Teacher[]){
+        return this.UserModel.insertMany(teachers.map(teacher => {
+            return {
+                name: teacher.name,
+                surname: teacher.surname,
+                role: Role.Teacher
+            }
+        }));
     }
 
     async processUser(user: GoogleUserInterface){

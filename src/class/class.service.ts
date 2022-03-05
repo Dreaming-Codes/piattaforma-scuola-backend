@@ -1,9 +1,10 @@
-import {Injectable} from '@nestjs/common';
+import {forwardRef, Inject, Injectable} from '@nestjs/common';
 import {Field, InputType} from "@nestjs/graphql";
 import {InjectModel} from "@nestjs/mongoose";
-import {Role, User, UserDocument} from "../user/user.entity";
-import {Model} from "mongoose";
+import {UserDocument} from "../user/user.entity";
+import {Model, Types} from "mongoose";
 import {ClassDocument} from "./class.entity";
+import {StudentInfo, UserService} from "../user/user.service";
 
 //TODO: RENDER CONDIVISI CON FRONTEND #1
 
@@ -44,20 +45,28 @@ export class dataTimetable {
 
 @Injectable()
 export class ClassService {
-    constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>,
-                @InjectModel(Class.name) private ClassModel: Model<ClassDocument>) {
+    constructor(@InjectModel(Class.name) private ClassModel: Model<ClassDocument>, @Inject(forwardRef(()=>UserService))private UserService: UserService) {}
+
+    removeUsers(id: Types.ObjectId[]) {
+        return Promise.all([
+            this.ClassModel.updateMany({students: {$in: id}}, {$pull: {students: {$in: id}}}, {multi: true}),
+            this.ClassModel.updateMany({teachers: {$in: id}}, {$pull: {teachers: {$in: id}}}, {multi: true})
+        ])
+    }
+
+    async setClassesForNewUsers(newUsers: (UserDocument & {_id: any})[], studentsInfo: [StudentInfo]){
+        const bulkOperator = this.ClassModel.collection.initializeUnorderedBulkOp();
+        newUsers.forEach((user, index) => {
+            bulkOperator.find({class: studentsInfo[index].class, division: studentsInfo[index].division}).updateOne({$push: {students: user._id}});
+        });
+
+        await bulkOperator.execute();
     }
 
     async importTimetable({classes, teachers}: dataTimetable): Promise<boolean> {
+
         try {
-            await this.UserModel.deleteMany({role: 'teacher', manual: false}).exec();
-            const insertedTeachers = await this.UserModel.insertMany(teachers.map(teacher => {
-                return {
-                    name: teacher.name,
-                    surname: teacher.surname,
-                    role: Role.Teacher
-                }
-            }));
+            const insertedTeachers = await this.UserService.importTeachers(teachers);
 
             await this.ClassModel.deleteMany({}).exec();
             await this.ClassModel.insertMany(classes.map(classe => {
@@ -86,4 +95,5 @@ export class ClassService {
             return false;
         }
     }
+
 }
