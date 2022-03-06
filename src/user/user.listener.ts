@@ -18,4 +18,13 @@ export class UserListener {
 
         return idsToBeDeleted;
     }
+
+    @OnEvent(User.name + ":deleteOne")
+    async onDeleteOne(userToBeDeletedFilter: _FilterQuery<any>) {
+        const userToDelete = await this.UserModel.findOne(userToBeDeletedFilter.originalQuery);
+
+        await this.ClassService.removeUsers([userToDelete._id]);
+
+        return [userToDelete._id];
+    }
 }

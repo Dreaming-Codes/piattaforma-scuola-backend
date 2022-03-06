@@ -61,4 +61,7 @@ export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);
 
 //This is mandatory for permitting import after and then login with email
-UserSchema.index({name: 1, surname: 1}, {unique: true});
+//TODO: Handle locale from envs
+//strength is needed for case insensitive index
+UserSchema.index({name: 1, surname: 1}, {unique: true, collation: {locale: "it", strength: 1}});
+UserSchema.index({email: 1}, {unique:true, sparse: true, collation: {locale: "it", strength: 1}});

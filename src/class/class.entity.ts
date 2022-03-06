@@ -45,4 +45,6 @@ export class Class {
 export type ClassDocument = Class & Document;
 export const ClassSchema = SchemaFactory.createForClass(Class);
 
-ClassSchema.index({class: 1, division: 1}, {unique: true});
+//TODO: Handle locale from envs
+//strength is needed for case insensitive index
+ClassSchema.index({class: 1, division: 1}, {unique: true, collation: {locale: "it", strength: 1}});

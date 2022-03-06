@@ -16,14 +16,22 @@ import {UserListener} from "./user.listener";
             useFactory (eventEmitter: EventEmitter2) {
                 const schema = UserSchema;
                 schema.pre('deleteMany', async function (next) {
-                    const originalQuery = this.getQuery();
                     const usersToDelete = await eventEmitter.emitAsync(User.name + ':deleteMany', {
-                        originalQuery
+                        originalQuery: this.getQuery()
                     });
                     this.setQuery({
                         _id: {
                             $in: usersToDelete.flat()
                         }
+                    });
+                    next();
+                });
+                schema.pre("deleteOne", (next) => {
+                    const userToDelete = eventEmitter.emitAsync(User.name + ':deleteOne', {
+                        originalQuery: this.getQuery()
+                    });
+                    this.setQuery({
+                        _id: userToDelete
                     });
                     next();
                 });

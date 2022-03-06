@@ -51,8 +51,9 @@ export class UserService {
         return true;
     }
 
-    importTeachers(teachers: Teacher[]){
-        return this.UserModel.insertMany(teachers.map(teacher => {
+    async importTeachers(teachers: Teacher[]){
+        await this.UserModel.deleteMany({role: Role.Teacher, manual: false}).exec();
+        return await this.UserModel.insertMany(teachers.map(teacher => {
             return {
                 name: teacher.name,
                 surname: teacher.surname,
@@ -62,7 +63,17 @@ export class UserService {
     }
 
     async processUser(user: GoogleUserInterface){
-        const dbUser = await this.UserModel.findOne({email: user.email}).exec();
+        const dbUser = await this.UserModel.findOne({name: user.name, surname: user.surname}, {}, {collation: {locale: "it", strength: 1}}).exec();
+        if(dbUser.email && dbUser.email !== user.email){
+            throw new Error("Email non corrispondente");
+        }else if(!dbUser.email){
+            dbUser.email = user.email;
+            dbUser.avatar = user.avatar;
+            await dbUser.save();
+        }else if(dbUser.avatar !== user.avatar){
+            dbUser.avatar = user.avatar;
+            await dbUser.save();
+        }
 
         return dbUser || await new this.UserModel(user).save();
     }
