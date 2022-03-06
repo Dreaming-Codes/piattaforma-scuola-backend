@@ -35,6 +35,8 @@
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
     "graphql": "^15",
+    "graphql-subscriptions": "^2.0.0",
+    "mongoosastic": "^4.6.0",
     "mongoose": "^6.0.13",
     "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0",

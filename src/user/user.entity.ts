@@ -24,36 +24,36 @@ export class User {
     _id: Types.ObjectId;
 
     @Field(()=>String)
-    @Prop({required: true})
+    @Prop({required: true, es_indexed: true})
     name: string;
 
     @Field(()=>String)
-    @Prop({required: true})
+    @Prop({required: true, es_indexed: true})
     surname: string;
 
     //TODO: add validation on name and surname
     @Field(()=>String, {nullable: true})
-    @Prop()
+    @Prop({es_indexed: false})
     fiscalCode: string;
 
     @Field(()=>String)
-    @Prop()
+    @Prop({es_indexed: false})
     avatar: string;
 
     @Field(()=>String, {defaultValue: Role.Student, nullable: true})
-    @Prop({required: true, default: Role.Student})
+    @Prop({required: true, default: Role.Student, index: true, es_indexed: false})
     role: string;
 
     @Field(()=>String)
-    @Prop({unique: false, required: false})
+    @Prop({unique: false, required: false, es_indexed: false})
     email: string;
 
     @Field(()=>Boolean)
-    @Prop({required: true, default: false})
+    @Prop({required: true, default: false, es_indexed: false})
     manual: boolean;
 
     @Field(()=>[String], {defaultValue: []})
-    @Prop({default: []})
+    @Prop({default: [], es_indexed: false})
     disorders: string[];
 }
 

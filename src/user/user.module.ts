@@ -7,6 +7,7 @@ import { UserResolver } from './user.resolver';
 import {ClassModule} from "../class/class.module";
 import {EventEmitter2} from "@nestjs/event-emitter";
 import {UserListener} from "./user.listener";
+import * as mongoosastic from "mongoosastic"
 
 @Module({
     imports: [
@@ -15,6 +16,10 @@ import {UserListener} from "./user.listener";
             name: User.name,
             useFactory (eventEmitter: EventEmitter2) {
                 const schema = UserSchema;
+
+                //TODO: Usare per la ricerca elasticsearch
+                UserSchema.plugin(mongoosastic)
+
                 schema.pre('deleteMany', async function (next) {
                     const usersToDelete = await eventEmitter.emitAsync(User.name + ':deleteMany', {
                         originalQuery: this.getQuery()

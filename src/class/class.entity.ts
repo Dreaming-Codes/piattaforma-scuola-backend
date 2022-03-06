@@ -1,4 +1,4 @@
-import {Field, ObjectType} from "@nestjs/graphql";
+import {Field, Int, ObjectType} from "@nestjs/graphql";
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {Document, Types} from "mongoose";
 import {User} from "../user/user.entity";
@@ -25,7 +25,7 @@ export class Class {
     @Field(()=>String)
     _id: Types.ObjectId;
 
-    @Field(()=>Number)
+    @Field(()=>Int)
     @Prop({required: true})
     class: number;
 
