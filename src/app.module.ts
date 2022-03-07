@@ -11,6 +11,7 @@ import { DisorderModule } from './disorder/disorder.module';
 import { DisorderPdfFieldModule } from './disorder-pdf-field/disorder-pdf-field.module';
 import {join} from 'path';
 import {EventEmitterModule} from "@nestjs/event-emitter";
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [ConfigModule.forRoot(), EventEmitterModule.forRoot(), MongooseModule.forRoot("mongodb://localhost:27017/test"), GraphQLModule.forRoot({
@@ -18,7 +19,7 @@ import {EventEmitterModule} from "@nestjs/event-emitter";
     installSubscriptionHandlers: true,
     playground: true,
     debug: false
-  }), UserModule, GoogleModule, ClassModule, DisorderModule, DisorderPdfFieldModule],
+  }), UserModule, GoogleModule, ClassModule, DisorderModule, DisorderPdfFieldModule, SearchModule],
   providers: [AppService, AppResolver],
 })
 export class AppModule {}

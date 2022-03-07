@@ -8,6 +8,7 @@ import {ClassModule} from "../class/class.module";
 import {EventEmitter2} from "@nestjs/event-emitter";
 import {UserListener} from "./user.listener";
 import * as mongoosastic from "mongoosastic"
+import {SearchModule} from "../search/search.module";
 
 @Module({
     imports: [
@@ -17,7 +18,6 @@ import * as mongoosastic from "mongoosastic"
             useFactory (eventEmitter: EventEmitter2) {
                 const schema = UserSchema;
 
-                //TODO: Usare per la ricerca elasticsearch
                 UserSchema.plugin(mongoosastic)
 
                 schema.pre('deleteMany', async function (next) {
@@ -44,7 +44,8 @@ import * as mongoosastic from "mongoosastic"
             },
             inject: [EventEmitter2]
         }]),
-        ClassModule
+        ClassModule,
+        SearchModule
     ],
     providers: [UserService, UserResolver, UserListener],
     exports: [UserService],

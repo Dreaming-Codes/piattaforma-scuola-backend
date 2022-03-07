@@ -24,11 +24,11 @@ export class User {
     _id: Types.ObjectId;
 
     @Field(()=>String)
-    @Prop({required: true, es_indexed: true})
+    @Prop({required: true, es_indexed: true, index: true})
     name: string;
 
     @Field(()=>String)
-    @Prop({required: true, es_indexed: true})
+    @Prop({required: true, es_indexed: true, index: true})
     surname: string;
 
     //TODO: add validation on name and surname
@@ -52,8 +52,8 @@ export class User {
     @Prop({required: true, default: false, es_indexed: false})
     manual: boolean;
 
-    @Field(()=>[String], {defaultValue: []})
-    @Prop({default: [], es_indexed: false})
+    @Field(()=>[String], {nullable: true})
+    @Prop({required: false, es_indexed: false})
     disorders: string[];
 }
 

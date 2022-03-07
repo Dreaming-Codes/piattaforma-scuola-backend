@@ -1,52 +1,31 @@
-import {Args, Int, Mutation, Query, Resolver, Subscription} from '@nestjs/graphql';
-import {StudentInfo, UserService} from "./user.service";
-import {PubSub} from "graphql-subscriptions";
-import {User} from "./user.entity";
-import {strict} from "assert";
+import {Args, Int, Mutation, Query, Resolver} from '@nestjs/graphql';
+import {StudentInfo, UserData, UserList, UserService} from "./user.service";
 
 @Resolver()
 export class UserResolver {
-    private pubSub: PubSub;
     private studentsNumber;
 
     constructor(private readonly userService: UserService) {
-        this.pubSub = new PubSub();
     }
 
-    @Mutation(()=>Boolean)
+    @Mutation(() => Boolean)
     //Should trigger subscriptions
     async importStudents(@Args('students', {type: () => [StudentInfo]}) students: [StudentInfo]) {
-        const importStudents = await this.userService.importStudents(students);
+        console.log(await this.userService.getUsersByName(20, 0, "MARIO1 ROSSI1"))
+        return true;
 
-        if(importStudents){
-            const newStudentsCount = await this.userService.studentsCount();
-            if(this.studentsNumber !== newStudentsCount){
-                this.studentsNumber = newStudentsCount;
-                this.pubSub.publish('studentsCount', {studentsCount: this.studentsNumber});
-            }
+        return Boolean(await this.userService.importStudents(students));
+    }
+
+    @Query(() => [UserData])
+    async getUsersByName(@Args("limit", {type: () => Int, defaultValue: 10}) limit: number,
+                            @Args("from", {type: () => Int, nullable: true, defaultValue: 0}) from: number,
+                            @Args("nameSearch", {nullable: true}) nameSearch: string,) {
+        if (limit > 20) {
+            limit = 20;
         }
 
-        return Boolean(importStudents);
+        return await this.userService.getUsersByName(limit, from, nameSearch);
     }
 
-    @Query(()=>[User])
-    async getStudents(@Args("limit", {type: () => Int}) limit: number, @Args("sortBy") sortBy: string, @Args("sortType") sortType: number){
-        if(limit > 30){
-            limit = 30;
-        }
-        return await this.userService.getStudents(limit, sortBy, sortType);
-    }
-
-    @Query(()=> Int)
-    async getStudentsCount() {
-        if(!this.studentsNumber){
-            this.studentsNumber = await this.userService.studentsCount();
-        }
-        return this.studentsNumber;
-    }
-
-    @Subscription(() => Int)
-    studentsCount() {
-        return this.pubSub.asyncIterator('studentsCount');
-    }
 }

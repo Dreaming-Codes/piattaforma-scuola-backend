@@ -6,6 +6,7 @@ import {Model, Types} from "mongoose";
 import {Field, InputType, Int, ObjectType, OmitType} from "@nestjs/graphql";
 import {ClassService, Teacher} from "../class/class.service";
 import {Class} from "../class/class.entity";
+import {SearchService} from "../search/search.service";
 
 @InputType()
 export class StudentInfo {
@@ -24,7 +25,7 @@ export class StudentInfo {
 }
 
 @ObjectType()
-export class StudentData {
+export class UserData {
     @Field(()=>String)
     _id: Types.ObjectId;
 
@@ -43,7 +44,7 @@ export class StudentData {
     @Field(()=>Boolean)
     manual: boolean;
 
-    @Field(()=>[String])
+    @Field(()=>[String], {nullable: true})
     disorders: string[];
 
     @Field(()=>Int, {nullable: true})
@@ -54,83 +55,53 @@ export class StudentData {
 }
 
 @ObjectType()
-export class StudentsList {
+export class UserList {
     @Field(()=>Int)
     count: number;
-    @Field(()=>[StudentData])
-    students: StudentData[];
+    @Field(()=>[UserData])
+    users: UserData[];
 }
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>, private ClassService: ClassService) {}
+    constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>, private ClassService: ClassService, private SearchService: SearchService) {}
 
-    studentsCount(){
-        return this.UserModel.countDocuments({role: Role.Student}).exec();
-    }
+    async getUsersByName(limit: number, from: number, nameSearch: string): Promise<UserData[]>{
+        const nameSearchResult = await this.SearchService.searchUsers(nameSearch, limit, from);
 
-    async getStudents(limit: number, sortBy: string, sortType: number): Promise<StudentsList>{
-        return await this.UserModel.aggregate([
+        return (await this.UserModel.aggregate([
             {
-                $match: {}
+                '$match': {_id: {$in: nameSearchResult.map(user => new Types.ObjectId(user))}}
             }, {
-                $lookup: {
-                    from: Class.name,
-                    localField: '_id',
-                    foreignField: 'students',
-                    as: 'classArray'
+                '$lookup': {
+                    'from': 'classes',
+                    'localField': '_id',
+                    'foreignField': 'students',
+                    'as': 'classArray'
                 }
             }, {
-                $addFields: {
-                    class: {
-                        $first: '$classArray.class'
+                '$addFields': {
+                    'class': {
+                        '$first': '$classArray.class'
                     },
-                    division: {
-                        $first: '$classArray.division'
+                    'division': {
+                        '$first': '$classArray.division'
                     }
                 }
             }, {
-                $match: {
-                    class: 3,
-                    division: 'CIA'
-                }
-            }, {
-                $project: {
-                    _id: 1,
-                    disorders: 1,
-                    manual: 1,
-                    surname: 1,
-                    name: 1,
-                    avatar: 1,
-                    class: 1,
-                    division: 1,
-                    fiscalCode: 1
-                }
-            }, {
-                $sort: {
-                    name: 1
-                }
-            }, {
-                $facet: {
-                    count: [
-                        {
-                            $count: 'count'
-                        }
-                    ],
-                    data: [
-                        {
-                            $limit: 10
-                        }
-                    ]
-                }
-            }, {
-                $addFields: {
-                    count: {
-                        $first: '$count.count'
-                    }
+                '$project': {
+                    '_id': 1,
+                    'disorders': 1,
+                    'manual': 1,
+                    'surname': 1,
+                    'name': 1,
+                    'avatar': 1,
+                    'class': 1,
+                    'division': 1,
+                    'fiscalCode': 1
                 }
             }
-        ]).exec()[0];
+        ]).exec()) as unknown as UserData[];
     }
 
     async importStudents(students: [StudentInfo]){
