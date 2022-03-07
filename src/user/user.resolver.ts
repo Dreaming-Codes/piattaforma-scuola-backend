@@ -11,13 +11,10 @@ export class UserResolver {
     @Mutation(() => Boolean)
     //Should trigger subscriptions
     async importStudents(@Args('students', {type: () => [StudentInfo]}) students: [StudentInfo]) {
-        console.log(await this.userService.getUsersByName(20, 0, "MARIO1 ROSSI1"))
-        return true;
-
         return Boolean(await this.userService.importStudents(students));
     }
 
-    @Query(() => [UserData])
+    @Query(() => UserList)
     async getUsersByName(@Args("limit", {type: () => Int, defaultValue: 10}) limit: number,
                             @Args("from", {type: () => Int, nullable: true, defaultValue: 0}) from: number,
                             @Args("nameSearch", {nullable: true}) nameSearch: string,) {

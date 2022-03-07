@@ -11,8 +11,8 @@ export class SearchService {
      * @param size Number of users to return
      * @param from Number of users to skip
      */
-    async searchUsers(query: string, size = 20, from = 0): Promise<string[]> {
-        return (await this.elasticsearchService.search({
+    async searchUsers(query: string, size = 20, from = 0): Promise<{ count: number, hits: string[] }> {
+        const elasticResult = (await this.elasticsearchService.search({
             index: 'users',
             body: {
                 query: {
@@ -23,7 +23,13 @@ export class SearchService {
                 size,
                 from
             },
-        })).hits.hits.map(hit => hit._id);
+        }));
+
+        return {
+            // @ts-ignore
+            count: elasticResult.hits.total.value,
+            hits: elasticResult.hits.hits.map(hit => hit._id)
+        };
     }
 
     unindexUsers(userIds: string[]) {

@@ -35,6 +35,9 @@ export class UserData {
     @Field(()=>String)
     surname: string;
 
+    @Field(()=>String)
+    role: string
+
     @Field(()=>String, {nullable: true})
     fiscalCode: string;
 
@@ -44,8 +47,8 @@ export class UserData {
     @Field(()=>Boolean)
     manual: boolean;
 
-    @Field(()=>[String], {nullable: true})
-    disorders: string[];
+    @Field(()=>Boolean, {nullable: true})
+    hasDisorders: boolean;
 
     @Field(()=>Int, {nullable: true})
     class: number;
@@ -66,12 +69,12 @@ export class UserList {
 export class UserService {
     constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>, private ClassService: ClassService, private SearchService: SearchService) {}
 
-    async getUsersByName(limit: number, from: number, nameSearch: string): Promise<UserData[]>{
+    async getUsersByName(limit: number, from: number, nameSearch: string): Promise<UserList>{
         const nameSearchResult = await this.SearchService.searchUsers(nameSearch, limit, from);
 
-        return (await this.UserModel.aggregate([
+        const mongoResult = (await this.UserModel.aggregate([
             {
-                '$match': {_id: {$in: nameSearchResult.map(user => new Types.ObjectId(user))}}
+                '$match': {_id: {$in: nameSearchResult.hits.map(user => new Types.ObjectId(user))}}
             }, {
                 '$lookup': {
                     'from': 'classes',
@@ -91,9 +94,10 @@ export class UserService {
             }, {
                 '$project': {
                     '_id': 1,
-                    'disorders': 1,
+                    hasDisorders: {$anyElementTrue: "$disorders"},
                     'manual': 1,
                     'surname': 1,
+                    'role': 1,
                     'name': 1,
                     'avatar': 1,
                     'class': 1,
@@ -102,6 +106,11 @@ export class UserService {
                 }
             }
         ]).exec()) as unknown as UserData[];
+
+        return {
+            count: nameSearchResult.count,
+            users: mongoResult
+        };
     }
 
     async importStudents(students: [StudentInfo]){

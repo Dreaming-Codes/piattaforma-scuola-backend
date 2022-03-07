@@ -15,7 +15,11 @@ export class UserListener {
         const usersToDelete = await this.UserModel.find(usersToBeDeletedFilter.originalQuery);
         const idsToBeDeleted = usersToDelete.map(user => user._id);
 
-        await this.SearchService.unindexUsers(idsToBeDeleted);
+        try {
+            await this.SearchService.unindexUsers(idsToBeDeleted);
+        } catch (e) {
+            //Ignore errors derived by not existing index
+        }
         await this.ClassService.removeUsers(idsToBeDeleted);
 
         return idsToBeDeleted;
@@ -25,7 +29,11 @@ export class UserListener {
     async onDeleteOne(userToBeDeletedFilter: _FilterQuery<any>) {
         const userToDelete = await this.UserModel.findOne(userToBeDeletedFilter.originalQuery);
 
-        await this.SearchService.unindexUsers([userToDelete._id]);
+        try{
+            await this.SearchService.unindexUsers([userToDelete._id]);
+        }catch (e) {
+            //Ignore errors derived by not existing index
+        }
         await this.ClassService.removeUsers([userToDelete._id]);
 
         return [userToDelete._id];
