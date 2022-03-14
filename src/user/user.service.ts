@@ -35,6 +35,9 @@ export class UserData {
     @Field(()=>String)
     surname: string;
 
+    @Field(()=>String, {nullable: true})
+    email: string;
+
     @Field(()=>String)
     role: string
 
@@ -101,6 +104,7 @@ export class UserService {
                     'name': 1,
                     'avatar': 1,
                     'class': 1,
+                    'email': 1,
                     'division': 1,
                     'fiscalCode': 1
                 }
