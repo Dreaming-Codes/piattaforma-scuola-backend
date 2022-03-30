@@ -12,11 +12,13 @@ import { DisorderPdfFieldModule } from './disorder-pdf-field/disorder-pdf-field.
 import {join} from 'path';
 import {EventEmitterModule} from "@nestjs/event-emitter";
 import { SearchModule } from './search/search.module';
+import {ApolloDriver, ApolloDriverConfig} from "@nestjs/apollo";
 
 @Module({
-  imports: [ConfigModule.forRoot(), EventEmitterModule.forRoot(), MongooseModule.forRoot("mongodb://localhost:27017/test"), GraphQLModule.forRoot({
+  imports: [ConfigModule.forRoot(), EventEmitterModule.forRoot(), MongooseModule.forRoot("mongodb://localhost:27017/test"), GraphQLModule.forRoot<ApolloDriverConfig>({
     autoSchemaFile: join(process.cwd(), 'schema.gql'),
     installSubscriptionHandlers: true,
+    driver: ApolloDriver,
     playground: true,
     debug: false
   }), UserModule, GoogleModule, ClassModule, DisorderModule, DisorderPdfFieldModule, SearchModule],
