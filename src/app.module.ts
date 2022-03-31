@@ -11,7 +11,6 @@ import { DisorderModule } from './disorder/disorder.module';
 import { DisorderPdfFieldModule } from './disorder-pdf-field/disorder-pdf-field.module';
 import {join} from 'path';
 import {EventEmitterModule} from "@nestjs/event-emitter";
-import { SearchModule } from './search/search.module';
 import {ApolloDriver, ApolloDriverConfig} from "@nestjs/apollo";
 
 @Module({
@@ -21,7 +20,7 @@ import {ApolloDriver, ApolloDriverConfig} from "@nestjs/apollo";
     driver: ApolloDriver,
     playground: true,
     debug: false
-  }), UserModule, GoogleModule, ClassModule, DisorderModule, DisorderPdfFieldModule, SearchModule],
+  }), UserModule, GoogleModule, ClassModule, DisorderModule, DisorderPdfFieldModule],
   providers: [AppService, AppResolver],
 })
 export class AppModule {}

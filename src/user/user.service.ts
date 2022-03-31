@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import {GoogleUserInterface} from "../google/googleUser.interface";
-import {InjectModel, Prop} from "@nestjs/mongoose";
+import {InjectModel} from "@nestjs/mongoose";
 import {Role, User, UserDocument} from "./user.entity";
 import {Model, Types} from "mongoose";
-import {Field, InputType, Int, ObjectType, OmitType} from "@nestjs/graphql";
+import {Field, InputType, Int, ObjectType} from "@nestjs/graphql";
 import {ClassService, Teacher} from "../class/class.service";
-import {Class} from "../class/class.entity";
-import {SearchService} from "../search/search.service";
 
 @InputType()
 export class StudentInfo {
@@ -70,15 +68,26 @@ export class UserList {
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>, private ClassService: ClassService, private SearchService: SearchService) {}
+    constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>, private ClassService: ClassService) {}
 
     async getUsersByName(limit: number, from: number, nameSearch: string): Promise<UserList>{
-        const nameSearchResult = await this.SearchService.searchUsers(nameSearch, limit, from);
-
-        const mongoResult = (await this.UserModel.aggregate([
+        return (await this.UserModel.aggregate([
             {
-                '$match': {_id: {$in: nameSearchResult.hits.map(user => new Types.ObjectId(user))}}
-            }, {
+                '$match': {
+                    '$expr': {
+                        '$regexMatch': {
+                            'input': {
+                                '$concat': [
+                                    '$name', ' ', '$surname'
+                                ]
+                            },
+                            'regex': nameSearch,
+                            'options': 'i'
+                        }
+                    }
+                }
+            },
+            {
                 '$lookup': {
                     'from': 'classes',
                     'localField': '_id',
@@ -108,13 +117,31 @@ export class UserService {
                     'division': 1,
                     'fiscalCode': 1
                 }
+            },
+            {
+                '$facet': {
+                    'count': [
+                        {
+                            '$count': 'count'
+                        }
+                    ],
+                    'users': [
+                        {
+                            '$skip': from
+                        },
+                        {
+                            '$limit': limit
+                        }
+                    ]
+                }
+            }, {
+                $addFields: {
+                    count: {
+                        $first: '$count.count'
+                    }
+                }
             }
-        ]).exec()) as unknown as UserData[];
-
-        return {
-            count: nameSearchResult.count,
-            users: mongoResult
-        };
+        ]).exec())[0] as unknown as Promise<UserList>;
     }
 
     async importStudents(students: [StudentInfo]){

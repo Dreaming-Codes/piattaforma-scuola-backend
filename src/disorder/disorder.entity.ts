@@ -29,8 +29,6 @@ export class Disorder {
     @Prop({required: true})
     description: string;
 
-    //TODO: replace base64 with something else
-    @Field(()=>String, {nullable: true})
     @Prop({required: false})
     pdf: Types.Buffer;
 

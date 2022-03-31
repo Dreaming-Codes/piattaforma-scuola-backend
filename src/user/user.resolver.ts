@@ -21,7 +21,6 @@ export class UserResolver {
         if (limit > 20) {
             limit = 20;
         }
-
         return await this.userService.getUsersByName(limit, from, nameSearch);
     }
 

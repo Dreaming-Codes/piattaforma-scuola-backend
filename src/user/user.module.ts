@@ -7,8 +7,6 @@ import { UserResolver } from './user.resolver';
 import {ClassModule} from "../class/class.module";
 import {EventEmitter2} from "@nestjs/event-emitter";
 import {UserListener} from "./user.listener";
-import * as mongoosastic from "mongoosastic"
-import {SearchModule} from "../search/search.module";
 
 @Module({
     imports: [
@@ -17,8 +15,6 @@ import {SearchModule} from "../search/search.module";
             name: User.name,
             useFactory (eventEmitter: EventEmitter2) {
                 const schema = UserSchema;
-
-                UserSchema.plugin(mongoosastic)
 
                 schema.pre('deleteMany', async function (next) {
                     const usersToDelete = await eventEmitter.emitAsync(User.name + ':deleteMany', {
@@ -44,8 +40,7 @@ import {SearchModule} from "../search/search.module";
             },
             inject: [EventEmitter2]
         }]),
-        ClassModule,
-        SearchModule
+        ClassModule
     ],
     providers: [UserService, UserResolver, UserListener],
     exports: [UserService],
