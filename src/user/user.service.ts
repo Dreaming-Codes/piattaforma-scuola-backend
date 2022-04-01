@@ -60,9 +60,9 @@ export class UserData {
 
 @ObjectType()
 export class UserList {
-    @Field(()=>Int)
+    @Field(()=>Int, {defaultValue: 0})
     count: number;
-    @Field(()=>[UserData])
+    @Field(()=>[UserData], {defaultValue: []})
     users: UserData[];
 }
 
