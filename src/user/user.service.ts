@@ -108,13 +108,13 @@ export class UserService {
                     '_id': 1,
                     hasDisorders: {$anyElementTrue: "$disorders"},
                     'manual': 1,
+                    'name': 1,
                     'surname': 1,
                     'role': 1,
-                    'name': 1,
                     'avatar': 1,
                     'class': 1,
-                    'email': 1,
                     'division': 1,
+                    'email': 1,
                     'fiscalCode': 1
                 }
             },
