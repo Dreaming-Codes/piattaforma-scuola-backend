@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import {Disorder, DisorderData, DisorderDocument} from "./disorder.entity";
 import {Model} from "mongoose";
 import {InjectModel} from "@nestjs/mongoose";
-import {User} from "../user/user.entity";
 
 @Injectable()
 export class DisorderService {

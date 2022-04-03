@@ -30,7 +30,7 @@ export class Disorder {
     description: string;
 
     @Prop({required: false})
-    pdf: Types.Buffer;
+    pdf: Buffer;
 
 }
 
