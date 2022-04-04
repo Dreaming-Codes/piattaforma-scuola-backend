@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {GoogleUserInterface} from "../google/googleUser.interface";
 import {InjectModel} from "@nestjs/mongoose";
 import {Role, User, UserDocument} from "./user.entity";
-import {Model, Types} from "mongoose";
+import {Model, Schema, Types} from "mongoose";
 import {Field, InputType, Int, ObjectType} from "@nestjs/graphql";
 import {ClassService, Teacher} from "../class/class.service";
 
@@ -64,6 +64,21 @@ export class UserList {
     count: number;
     @Field(()=>[UserData], {defaultValue: []})
     users: UserData[];
+}
+
+@ObjectType()
+export class ClassData {
+    @Field(()=>String)
+    _id: Types.ObjectId;
+
+    @Field(()=>String)
+    division: string;
+
+    @Field(()=>Int)
+    class: number;
+
+    @Field(()=>[User])
+    students: User[];
 }
 
 @Injectable()
@@ -142,6 +157,68 @@ export class UserService {
                 }
             }
         ]).exec())[0] as unknown as Promise<UserList>;
+    }
+
+    async getStudentsByTeacherId(teacherID: Types.ObjectId){
+        return (await this.UserModel.aggregate([
+            {
+                '$match': {
+                    '_id': teacherID
+                }
+            }, {
+                '$lookup': {
+                    'from': 'classes',
+                    'localField': '_id',
+                    'foreignField': 'teachers.teachers',
+                    'as': 'classArray'
+                }
+            }, {
+                '$project': {
+                    '_id': 0,
+                    'classArray': 1
+                }
+            }, {
+                '$unwind': {
+                    'path': '$classArray'
+                }
+            }, {
+                '$addFields': {
+                    '_id': '$classArray._id',
+                    'division': '$classArray.division',
+                    'class': '$classArray.class'
+                }
+            }, {
+                '$lookup': {
+                    'from': 'users',
+                    'localField': 'classArray.students',
+                    'foreignField': '_id',
+                    'as': 'students'
+                }
+            }, {
+                '$project': {
+                    'classArray': 0
+                }
+            }, {
+                '$addFields': {
+                    'students.class': '$class',
+                    'students.division': '$division'
+                }
+            }, {
+                '$project': {
+                    '_id': 0,
+                    'division': 0,
+                    'class': 0
+                }
+            }, {
+                '$unwind': {
+                    'path': '$students'
+                }
+            }, {
+                '$replaceRoot': {
+                    'newRoot': '$students'
+                }
+            }
+        ]).exec()) as unknown as Promise<[ClassData]>;
     }
 
     async importStudents(students: [StudentInfo]){

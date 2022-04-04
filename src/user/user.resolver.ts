@@ -1,5 +1,6 @@
 import {Args, Int, Mutation, Query, Resolver} from '@nestjs/graphql';
-import {StudentInfo, UserList, UserService} from "./user.service";
+import {ClassData, StudentInfo, UserList, UserService} from "./user.service";
+import {Types} from "mongoose";
 
 @Resolver()
 export class UserResolver {
@@ -19,6 +20,11 @@ export class UserResolver {
             limit = 20;
         }
         return await this.userService.getUsersByName(limit, from, nameSearch);
+    }
+
+    @Query(() => [ClassData])
+    async getClasses() {
+        return await this.userService.getStudentsByTeacherId(new Types.ObjectId("6244a5f2570e38f13f6ed669"))
     }
 
 }
