@@ -66,21 +66,6 @@ export class UserList {
     users: UserData[];
 }
 
-@ObjectType()
-export class ClassData {
-    @Field(()=>String)
-    _id: Types.ObjectId;
-
-    @Field(()=>String)
-    division: string;
-
-    @Field(()=>Int)
-    class: number;
-
-    @Field(()=>[User])
-    students: User[];
-}
-
 @Injectable()
 export class UserService {
     constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>, private ClassService: ClassService) {}
@@ -218,7 +203,7 @@ export class UserService {
                     'newRoot': '$students'
                 }
             }
-        ]).exec()) as unknown as Promise<[ClassData]>;
+        ]).exec()) as unknown as Promise<[UserData]>;
     }
 
     async importStudents(students: [StudentInfo]){
