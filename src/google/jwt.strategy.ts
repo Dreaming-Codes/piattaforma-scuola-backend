@@ -1,6 +1,7 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import {PassportStrategy} from '@nestjs/passport';
-import {Injectable} from "@nestjs/common";
+import {ExecutionContext, Injectable} from "@nestjs/common";
+import {GqlExecutionContext} from "@nestjs/graphql";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -13,9 +14,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        const {name, surname, email, avatar} = payload;
+        const {_id, name, surname, email, avatar, role} = payload;
         return{
-            name, surname, email, avatar
+            _id, name, surname, email, avatar, role
         }
     }
 }

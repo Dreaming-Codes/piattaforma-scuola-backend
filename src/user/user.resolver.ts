@@ -1,6 +1,10 @@
 import {Args, Int, Mutation, Query, Resolver} from '@nestjs/graphql';
 import {StudentInfo, UserData, UserList, UserService} from "./user.service";
 import {Types} from "mongoose";
+import {UseGuards, Request} from "@nestjs/common";
+import {JwtGuard} from "../google/jwt.guard";
+import {JwtGraphqlGuard} from "../google/jwt.graphql.guard";
+import {CurrentUser} from "../google/jwt.decorator";
 
 @Resolver()
 export class UserResolver {
@@ -23,8 +27,9 @@ export class UserResolver {
     }
 
     @Query(() => [UserData])
-    async getMyStudents() {
-        return await this.userService.getStudentsByTeacherId(new Types.ObjectId("6229e285b2e589903d4267ae"))
+    @UseGuards(JwtGraphqlGuard)
+    async getMyStudents(@CurrentUser() user: any) {
+        return await this.userService.getStudentsByTeacherId(new Types.ObjectId(user._id))
     }
 
 }
