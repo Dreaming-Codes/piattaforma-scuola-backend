@@ -16,9 +16,9 @@ export class GoogleController {
   @UseGuards(GoogleGuard)
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     if(req.user) {
-      res.redirect('https://localhost/authComplete?token=' + req.user)
+      res.redirect(`${process.env.FRONTEND_URL}/authComplete?token=${req.user}`)
     }else{
-      res.redirect('https://localhost/authFailed')
+      res.redirect(`${process.env.FRONTEND_URL}/authFailed`)
     }
   }
 
