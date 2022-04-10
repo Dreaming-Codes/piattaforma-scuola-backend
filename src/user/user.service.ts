@@ -5,6 +5,7 @@ import {Role, User, UserDocument} from "./user.entity";
 import {Model, Schema, Types} from "mongoose";
 import {Field, InputType, Int, ObjectType} from "@nestjs/graphql";
 import {ClassService, Teacher} from "../class/class.service";
+import {Class} from "../class/class.entity";
 
 @InputType()
 export class StudentInfo {
@@ -66,9 +67,52 @@ export class UserList {
     users: UserData[];
 }
 
+@ObjectType()
+export class Student extends User {
+    @Field(()=>Class, {nullable: false})
+    class: Class;
+}
+
 @Injectable()
 export class UserService {
     constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>, private ClassService: ClassService) {}
+
+    async getStudentById(id: Types.ObjectId): Promise<Student> {
+        return (await this.UserModel.aggregate([
+            {
+                '$match': {
+                    _id: id,
+                    role: "Student"
+                }
+            }, {
+                '$lookup': {
+                    'from': 'classes',
+                    'localField': '_id',
+                    'foreignField': 'students',
+                    'as': 'classArray'
+                }
+            }, {
+                '$addFields': {
+                    'class': {
+                        '$first': '$classArray'
+                    }
+                }
+            }, {
+                '$project': {
+                    '_id': 1,
+                    'disorders': 1,
+                    'manual': 1,
+                    'name': 1,
+                    'surname': 1,
+                    'role': 1,
+                    'avatar': 1,
+                    'class': 1,
+                    'email': 1,
+                    'fiscalCode': 1
+                }
+            }
+        ]).exec())[0] as Student;
+    }
 
     async getUsersByName(limit: number, from: number, nameSearch: string): Promise<UserList>{
         return (await this.UserModel.aggregate([

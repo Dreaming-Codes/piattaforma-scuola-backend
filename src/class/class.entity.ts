@@ -5,22 +5,19 @@ import {User} from "../user/user.entity";
 
 
 @ObjectType()
-class Teacher {
-    @Field(()=>User)
-    @Prop({ref: User.name, type: [Types.ObjectId]})
-    user: User[];
+class Teachers {
+    @Field(() => [String])
+    @Prop({required: true})
+    subjects: string[];
 
-    @Field(()=>[String])
-    taughtSubjects: [string];
+    @Field(()=>[User])
+    @Prop({type: [Types.ObjectId], required: true, index: true})
+    teachers: Types.ObjectId[];
 
-    @Field(()=>Boolean, {defaultValue: false})
-    isCoordinator: boolean;
 }
 
 @ObjectType()
-@Schema({
-    autoIndex: true,
-})
+@Schema({})
 export class Class {
     @Field(()=>String)
     _id: Types.ObjectId;
@@ -37,9 +34,9 @@ export class Class {
     @Prop({type: [Types.ObjectId], ref: User.name})
     students: User[];
 
-    @Field(()=>[User])
+    @Field(()=>[Teachers])
     @Prop()
-    teachers: Teacher[];
+    teachers: Teachers[];
 }
 
 export type ClassDocument = Class & Document;

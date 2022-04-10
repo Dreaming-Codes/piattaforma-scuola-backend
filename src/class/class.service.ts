@@ -3,7 +3,7 @@ import {Field, InputType} from "@nestjs/graphql";
 import {InjectModel} from "@nestjs/mongoose";
 import {UserDocument} from "../user/user.entity";
 import {Model, Types} from "mongoose";
-import {ClassDocument} from "./class.entity";
+import {Class, ClassDocument} from "./class.entity";
 import {StudentInfo, UserService} from "../user/user.service";
 
 //TODO: RENDER CONDIVISI CON FRONTEND #1
@@ -25,7 +25,7 @@ export class classTeacher {
 }
 
 @InputType()
-export class Class {
+export class ClassInput {
     @Field()
     class: number;
     @Field()
@@ -36,8 +36,8 @@ export class Class {
 
 @InputType()
 export class dataTimetable {
-    @Field(() => [Class])
-    classes: Class[]
+    @Field(() => [ClassInput])
+    classes: ClassInput[]
     @Field(() => [Teacher])
     teachers: Teacher[]
 }
@@ -61,6 +61,10 @@ export class ClassService {
         });
 
         await bulkOperator.execute();
+    }
+
+    getClass(id: Types.ObjectId) {
+        return this.ClassModel.findById(id);
     }
 
     async importTimetable({classes, teachers}: dataTimetable): Promise<boolean> {
