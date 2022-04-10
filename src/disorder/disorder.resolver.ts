@@ -1,5 +1,5 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql';
-import {Disorder, DisorderData, DisorderDocument} from "./disorder.entity";
+import {DisorderData, DisorderDocument, InputDisorder} from "./disorder.entity";
 import {DisorderService} from "./disorder.service";
 import {FileUpload, GraphQLUpload} from "graphql-upload-minimal";
 import {stream2buffer} from "../utils";
@@ -15,8 +15,8 @@ export class DisorderResolver {
     }
 
     @Mutation(()=>Boolean)
-    async newDisorder(@Args("disorderDocument", {type: ()=> Disorder}) disorderDocument: DisorderDocument,
-                      @Args("pdf", {type: ()=> GraphQLUpload}) {createReadStream,filename}: FileUpload){
+    async newDisorder(@Args("disorderDocument", {type: ()=> InputDisorder}) disorderDocument: DisorderDocument,
+                      @Args("pdf", {type: ()=> GraphQLUpload}) {createReadStream}: FileUpload){
         disorderDocument.pdf = await stream2buffer(createReadStream());
         try {
             this.DisorderService.newDisorder(disorderDocument);

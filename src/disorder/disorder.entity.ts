@@ -1,4 +1,4 @@
-import {Field, InputType, ObjectType} from "@nestjs/graphql";
+import {Field, InputType, ObjectType, OmitType} from "@nestjs/graphql";
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {Document, Types} from "mongoose";
 
@@ -15,8 +15,23 @@ export class DisorderData {
 }
 
 @ObjectType()
-@Schema()
+export class field {
+    @Field(()=>String)
+    _id: Types.ObjectId;
+
+    @Field(()=>String)
+    type: string;
+
+    @Field(()=>Boolean)
+    availableToRepresentative: boolean;
+}
+
 @InputType()
+export class InputField extends OmitType(field, ["_id"], InputType) {}
+
+
+@ObjectType()
+@Schema()
 export class Disorder {
     @Field(()=>String, {nullable: true})
     _id: Types.ObjectId;
@@ -32,6 +47,15 @@ export class Disorder {
     @Prop({required: false})
     pdf: Buffer;
 
+    @Field(()=>[field])
+    @Prop({required: true})
+    fields: field[]
+}
+
+@InputType()
+export class InputDisorder extends OmitType(Disorder, ["fields", "_id"], InputType) {
+    @Field(()=>[InputField])
+    fields: field[]
 }
 
 export type DisorderDocument = Disorder & Document;
