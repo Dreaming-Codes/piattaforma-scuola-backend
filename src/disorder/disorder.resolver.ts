@@ -1,7 +1,7 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql';
 import {DisorderData, DisorderDocument, InputDisorder} from "./disorder.entity";
 import {DisorderService} from "./disorder.service";
-import {FileUpload, GraphQLUpload} from "graphql-upload-minimal";
+import {FileUpload, GraphQLUpload} from "graphql-upload";
 import {stream2buffer} from "../utils";
 
 @Resolver()

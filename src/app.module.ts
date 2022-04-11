@@ -19,7 +19,11 @@ import {ApolloDriver, ApolloDriverConfig} from "@nestjs/apollo";
     installSubscriptionHandlers: true,
     driver: ApolloDriver,
     playground: true,
-    debug: false
+    debug: false,
+    cors: {
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+    }
   }), UserModule, GoogleModule, ClassModule, DisorderModule, DisorderPdfFieldModule],
   providers: [AppService, AppResolver],
 })

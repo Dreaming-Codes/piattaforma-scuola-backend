@@ -1,4 +1,4 @@
-import {Field, InputType, ObjectType, OmitType} from "@nestjs/graphql";
+import {Field, InputType, Int, ObjectType, OmitType} from "@nestjs/graphql";
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {Document, Types} from "mongoose";
 
@@ -19,15 +19,15 @@ export class field {
     @Field(()=>String)
     _id: Types.ObjectId;
 
-    @Field(()=>String)
-    type: string;
+    @Field(()=>Int)
+    type: number;
 
     @Field(()=>Boolean)
     availableToRepresentative: boolean;
 }
 
 @InputType()
-export class InputField extends OmitType(field, ["_id"], InputType) {}
+export class InputField extends OmitType(field, [], InputType) {}
 
 
 @ObjectType()
@@ -53,7 +53,7 @@ export class Disorder {
 }
 
 @InputType()
-export class InputDisorder extends OmitType(Disorder, ["fields", "_id"], InputType) {
+export class InputDisorder extends OmitType(Disorder, ["fields"], InputType) {
     @Field(()=>[InputField])
     fields: field[]
 }
