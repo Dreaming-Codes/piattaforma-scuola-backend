@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {Disorder, DisorderData, DisorderDocument} from "./disorder.entity";
-import {Model} from "mongoose";
+import {Model, Types} from "mongoose";
 import {InjectModel} from "@nestjs/mongoose";
 
 @Injectable()
@@ -18,6 +18,10 @@ export class DisorderService {
                 }
             }
         ]).exec() as unknown as Promise<DisorderData[]>;
+    }
+
+    getDisorder(id: string | Types.ObjectId): Promise<DisorderDocument>{
+        return this.DisorderModel.findById(id).exec();
     }
 
     newDisorder(disorder: DisorderDocument): Promise<DisorderDocument> {

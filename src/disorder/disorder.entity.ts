@@ -44,6 +44,8 @@ export class Disorder {
     @Prop({required: true})
     description: string;
 
+    //TODO: send an hashed link instead of a string
+    @Field(()=>String)
     @Prop({required: false})
     pdf: Buffer;
 

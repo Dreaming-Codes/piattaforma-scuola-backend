@@ -1,5 +1,5 @@
 import {Args, Mutation, Query, Resolver} from '@nestjs/graphql';
-import {DisorderData, DisorderDocument, InputDisorder} from "./disorder.entity";
+import {Disorder, DisorderData, DisorderDocument, InputDisorder} from "./disorder.entity";
 import {DisorderService} from "./disorder.service";
 import {FileUpload, GraphQLUpload} from "graphql-upload";
 import {stream2buffer} from "../utils";
@@ -24,5 +24,14 @@ export class DisorderResolver {
             return false;
         }
         return true
+    }
+
+    @Query(()=>Disorder)
+    async getDisorder(@Args("id") id: string){
+        const result = await this.DisorderService.getDisorder(id);
+        return {
+            ...result,
+            pdf: result.pdf.toString()
+        };
     }
 }
